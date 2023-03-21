@@ -92,18 +92,17 @@ public class PathPlanner {
    *
    * @param name The name of the path group to load
    * @param reversed Should the robot follow this path group reversed
-   * @param constraint The PathConstraints (max velocity, max acceleration) of the first path in the
-   *     group
-   * @param constraints The PathConstraints (max velocity, max acceleration) of the remaining paths
+   * @param constraints The PathConstraints (max velocity, max acceleration) of the paths
    *     in the group. If there are less constraints than paths, the last constrain given will be
    *     used for the remaining paths.
    * @return A List of all generated paths in the group
    */
   public static List<PathPlannerTrajectory> loadPathGroup(
-      String name, boolean reversed, PathConstraints constraint, PathConstraints... constraints) {
-    List<PathConstraints> allConstraints = new ArrayList<>();
-    allConstraints.add(constraint);
-    allConstraints.addAll(Arrays.asList(constraints));
+      String name, boolean reversed, PathConstraints... constraints) {
+    List<PathConstraints> allConstraints = Arrays.asList(constraints);
+    if (allConstraints.isEmpty()) {
+      throw new IllegalArgumentException("no PathConstraints specified.  You must supply at least one PathConstraints object to describe the maximum velocity and acceleration for your path group.");
+    }
 
     try (BufferedReader br =
         new BufferedReader(
@@ -193,16 +192,14 @@ public class PathPlanner {
    * based on the waypoints marked as "stop points"
    *
    * @param name The name of the path group to load
-   * @param constraint The PathConstraints (max velocity, max acceleration) of the first path in the
-   *     group
-   * @param constraints The PathConstraints (max velocity, max acceleration) of the remaining paths
+   * @param constraints The PathConstraints (max velocity, max acceleration) of the paths
    *     in the group. If there are less constraints than paths, the last constrain given will be
    *     used for the remaining paths.
    * @return A List of all generated paths in the group
    */
   public static List<PathPlannerTrajectory> loadPathGroup(
-      String name, PathConstraints constraint, PathConstraints... constraints) {
-    return loadPathGroup(name, false, constraint, constraints);
+      String name, PathConstraints... constraints) {
+    return loadPathGroup(name, false, constraints);
   }
 
   /**
